@@ -1,351 +1,266 @@
-# ClayMotion 阶段3：Veo3 提示词生成
+# ClayMotion 阶段3：完整提示词生成 (Full Prompt Generation)
 
-**目标：** 基于阶段2的分镜设计，生成完整的 Veo3 视频提示词。
+**目标：** 为每个分镜生成完整的 Veo3 视频提示词，所有信息（场景/角色/动作/镜头/转场）都融入英文提示词中。
 
 ---
 
-## Veo3 提示词最佳实践
+## 输入要求
 
-基于 Google Veo3 官方指南和实践经验：
+### 来自阶段1的产物
+- 风格选择 (Style A 光面黏土风 / Style B 暖心毛毡风)
+- 画幅选择 (16:9 / 9:16 / 1:1)
+- 隐喻对象映射表
 
-### 核心原则
+### 来自阶段2的产物
+- 完整的分镜脚本 (Scene 1-N)
+- 每个分镜的文案 (≤30字)
+- 每个场景的详细描述（环境/角色/动作/镜头）
 
-1. **明确声明风格**: 必须在开头声明 `stop-motion claymation` 或 `needle felting style`
-2. **具体描述主体**: 详细描述外观、材质、颜色、状态
-3. **使用电影术语**: Veo3 理解专业镜头语言（dolly, tracking, crane 等）
-4. **指定镜头角度**: 明确 top-down, side view, close-up 等
-5. **描述动态过程**: 起始→变化→结束的完整过程
-6. **包含环境氛围**: 光线、色调、背景、情绪
+---
+
+## 核心原则
 
 ### 提示词结构
 
+每个场景输出**两个部分**：
+
+1. **分镜文案（中文）**: 1-3个短句，≤30字
+2. **Veo3 Prompt（英文）**: 完整的视频生成提示词，包含所有信息
+
+### Veo3 提示词结构
+
 ```
-[风格声明] + [镜头角度] + [场景环境] + [主体描述] + [动态过程] + [镜头运动] + [光影氛围]
+[风格定义] + [场景描述] + [角色与动作] + [镜头运动] + [转场]
 ```
+
+**关键要素**：
+1. **风格关键词**: 定格动画 + 材质（黏土/毛毡）
+2. **场景描述**: 环境、背景、道具
+3. **角色形象**: 主角和配角的造型、颜色、状态
+4. **核心动作**: 起始→核心→结束的完整过程
+5. **镜头运动**: 推/拉/摇/移/跟，快/慢/平滑
+6. **转场方式**: 硬切/溶解/匹配剪辑/模糊过渡
+
+### 文字显示规则
+
+**涉及文字的元素使用英文显示**：
+- 名字卡片 → `name card with text "xxx"`
+- 对话气泡 → `speech bubble with text "xxx"`
+- 日历/日期 → `calendar showing date "xxx"`
+- 按钮/标签 → `button with label "xxx"`
+- 字幕 → `subtitle "xxx"`
+- 标志/Logo → 保持原样（OpenAI、Google、edX 等）
 
 ---
 
 ## 风格关键词库
 
 ### Style A: 光面黏土风 (Smooth Polymer Clay)
-
 ```
-Stop-motion claymation animation, smooth polymer clay with glossy surface and subtle fingerprint textures, vibrant saturated colors, cute miniature aesthetic, clean 3D render quality, soft rounded edges
+Stop-motion claymation animation, smooth polymer clay style with glossy surface and subtle fingerprints, clean 3d render quality, soft rounded edges, vibrant and fresh colors, cute anthropomorphic characters, miniature set
 ```
 
 ### Style B: 暖心毛毡风 (Needle Felting)
-
 ```
-Stop-motion claymation animation, needle felting style with wool texture and visible fibers, fuzzy surface with loose fibers, soft edges, warm cozy lighting, handcrafted felt aesthetic, fluffy and touchable quality
-```
-
-### Style C: 像素怀旧风 (Pixel-Nostalgia)
-
-```
-Pixel art animation, retro 16-bit game aesthetic, visible pixel grid with aliased stepped edges and blocky shapes, limited color palette with dithering gradients, crisp pixel-perfect details, nostalgic video game style, versatile scenes including warm cozy interiors panoramic landscapes atmospheric cityscapes and traditional Chinese architecture, adaptable color moods from soft pastels to vibrant saturated to desaturated tones
-```
-
-### Style D: 霓虹慢波风 (Neon-Lofi)
-
-```
-Detailed digital illustration animation, neon purple magenta and deep blue color scheme with glowing neon signs and screens, lo-fi anime aesthetic with dense intricate details, night or dusk atmosphere with warm interior lights contrasting cool exterior, versatile scenes including cozy gamer rooms Asian city streets at night and minimal calming spaces, cozy yet cyberpunk mood with pink clouds and ambient glow
-```
-
-### Style E: 水彩梦境风 (Watercolor-Dream)
-
-```
-Watercolor painting animation, visible paper texture with natural pigment bleeding and soft diffused edges, transparent color layering with hand-painted brushstroke quality, atmospheric washes and traditional watercolor technique, versatile scenes including majestic landscapes Studio Ghibli inspired daily life children's book illustration and urban sketching, dreamy and poetic mood with serene innocent and storytelling atmosphere
-```
-
-### Style F: 布艺温暖风 (Fabric-Craft)
-
-**完整版关键词：**
-```
-Stop-motion fabric craft animation, coarse burlap and vintage fabric scraps with patchwork design, woven jute and felt texture, fraying edges and loose threads visible, thick hand stitching and seam details, mismatched button eyes, embroidered facial features, stuffed plushie aesthetic with handmade quality, natural cloth folds and wrinkles, shallow depth of field with soft bokeh background, jerky movement characteristic of stop-motion, 12fps feel, warm color palette with natural fabric tones, gentle diffused lighting with no harsh shadows, cozy comfortable and healing atmosphere, volumetric lighting with dust motes in sunlight, Laika Studios style blend of 3D render with practical effects, characters can be humans animals toys or anthropomorphic creatures
-```
-
-**精简版关键词：**
-```
-Stop-motion fabric craft animation, patchwork burlap and felt texture with visible stitching, fraying edges and loose threads, button eyes and embroidered features, shallow depth of field with bokeh background, jerky stop-motion movement, warm color palette with natural fabric tones, cozy handmade quality
-```
-
-**布艺风 Magic Words（Veos3 强化词）：**
-- **材质词**: coarse burlap (粗麻布), felt (毛毡), fraying edges (磨损边缘), loose threads (松散线头), patchwork (拼布), woven jute (黄麻编织), thick stitching (粗针脚)
-- **摄影词**: macro lens (微距镜头), shallow depth of field (浅景深/背景虚化), bokeh background (焦外背景), tilt-shift (移轴效果 - 玩具感), 85mm lens, f/1.8 aperture
-- **动态词**: 12fps (低帧率感), stop-motion (定格), jerky movement (顿挫移动)
-
----
-
-## 镜头角度关键词
-
-| 角度 | Veo3 关键词 |
-|------|------------|
-| 正面 | `frontal view`, `facing camera`, `straight-on shot` |
-| 侧面 | `side view`, `profile shot`, `lateral angle` |
-| 背面 | `from behind`, `rear view`, `over-the-shoulder` |
-| 俯视 | `top-down view`, `bird's eye view`, `overhead shot`, `looking down at` |
-| 仰视 | `low angle shot`, `looking up at`, `worm's eye view` |
-| 特写 | `close-up shot`, `macro shot`, `extreme close-up`, `detail shot` |
-| 中景 | `medium shot`, `waist shot`, `mid shot` |
-| 远景 | `wide shot`, `establishing shot`, `full shot` |
-| 斜角 | `dutch angle`, `tilted frame`, `canted angle` |
-| 环绕 | `orbiting shot`, `360 rotation`, `circular tracking` |
-
----
-
-## 镜头运动关键词
-
-| 运动 | Veo3 关键词 |
-|------|------------|
-| 静止 | `static camera`, `locked off shot`, `fixed frame` |
-| 推近 | `dolly in`, `push forward`, `slow zoom in`, `camera moves closer` |
-| 拉远 | `dolly out`, `pull back`, `zoom out`, `camera retreats` |
-| 平移 | `pan left`, `pan right`, `horizontal pan` |
-| 跟随 | `tracking shot`, `following movement`, `camera follows` |
-| 环绕 | `orbiting around`, `circular tracking`, `rotating view` |
-| 升起 | `crane up`, `rising shot`, `vertical ascent` |
-| 下降 | `crane down`, `descending shot`, `lowering` |
-
----
-
-## 提示词模板
-
-### 模板 A: 无角色场景（物品/场景主导）
-
-```
-[Style], [camera angle] [shot type], [environment description], [main objects with detailed appearance], [object animation: starting state → action → ending state], [camera movement], [lighting and mood], [transition if needed]
-```
-
-**示例：**
-```
-Stop-motion claymation animation, needle felting style with wool texture and visible fibers, top-down view medium shot, on a warm wooden desk surface with soft ambient lighting, several felted banknotes with tiny wings flutter and take flight one by one, flying toward a small sign reading "AI Course ¥3999", a felted wallet in the center gradually deflates and flattens as money escapes, the last banknote hovers momentarily before flying away, static camera with subtle push in at the end, warm golden hour lighting with soft shadows, gentle cozy atmosphere
-```
-
-### 模板 B: 有角色场景（角色参与）
-
-```
-[Style], [camera angle] [shot type], [environment description], [character detailed appearance from head to toe], [character action and expression: starting → action → ending], [surrounding objects and their states], [camera movement], [lighting and mood]
-```
-
-**示例：**
-```
-Stop-motion claymation animation, needle felting style with fuzzy wool texture, medium shot from slight low angle, in a cozy craft room with warm lighting, a cute felted orange fox character with round black button eyes, wearing a yellow beret and teal sweater, stands next to an ornate treasure chest, the fox reaches out with tiny felted paws and slowly lifts the chest lid, golden light bursts out illuminating the fox's face with wonder, eyes widen and mouth forms an O shape of amazement, glowing cards labeled with tech logos float upward from the chest, camera slowly pushes in toward the treasure, warm magical glow fills the scene
-```
-
-### 模板 C: 特写/细节场景
-
-```
-[Style], extreme close-up / macro shot, [specific object or detail], [texture and material description], [micro animation or subtle movement], [shallow depth of field], [lighting highlighting texture]
-```
-
-**示例：**
-```
-Stop-motion claymation animation, smooth polymer clay style, extreme close-up shot, a felted finger pressing a glowing "Copy" button, the button depresses with satisfying tactile feedback, multiple document cards instantly duplicate and fan outward from the button, each card has visible paper texture and subtle wobble, shallow depth of field with soft bokeh background, cool blue accent lighting on the button glow, crisp and satisfying micro-animation
-```
-
-### 模板 D: 对比/并列场景
-
-```
-[Style], [split screen or side-by-side composition], [left side description], [right side description], [contrasting elements], [animation showing difference], [camera movement if any], [lighting emphasizing contrast]
-```
-
-**示例：**
-```
-Stop-motion claymation animation, needle felting style, medium wide shot with split composition, on the left side a stressed felted character surrounded by scattered expensive course materials and depleted wallet, on the right side the same character relaxed and smiling with free resources floating around glowing happily, a dividing line of light separates the two scenes, the contrast emphasizes the transformation, static camera, left side has dim frustrated lighting while right side glows with warm optimistic light
-```
-
-### 模板 E: 流程/变化场景
-
-```
-[Style], [appropriate angle for showing process], [starting state of scene/objects], [step-by-step transformation description], [ending state], [camera following the process], [lighting shifting with mood]
-```
-
-**示例：**
-```
-Stop-motion claymation animation, polymer clay style with slight sheen, top-down tracking shot, starting with a messy desk covered in scattered notes and question marks, felted hands enter frame and begin organizing, papers transform into neat stacked folders, question marks morph into lightbulb icons one by one, a progress bar made of clay fills from left to right, ending with a perfectly organized workspace with a glowing checkmark appearing, camera slowly tracks across the transformation, lighting gradually brightens from dim confusion to clear productive glow
+Stop-motion claymation animation, needle felting style with wool texture and visible fibers, fuzzy surface, loose fibers, soft edges, warm and cozy lighting, handcrafted felt dolls, stop motion aesthetic, felted fabric background, fluffy and touchable
 ```
 
 ---
 
 ## 输出格式
 
-每个场景输出以下内容：
+每个场景按以下格式输出：
 
 ```markdown
 ## Scene X: [场景标题]
 
-**分镜文案（中文）:**
-[原文案，用于配音/字幕]
+**分镜文案（中文）：**
+[1-3个短句，≤30字]
 
-**视觉描述（中文）:**
-[这个画面在展示什么，视觉隐喻说明]
-
-**Veo3 Prompt:**
+**Veo3 Prompt (英文):**
 ```
-[完整的英文提示词，包含：风格声明 + 镜头角度+景别 + 场景环境 + 主体描述 + 动态过程 + 镜头运动 + 光影氛围]
+[风格关键词], [场景描述], [角色形象与动作], [镜头运动], [转场方式]
 ```
-
-**备注:**
-[可选，补充说明，如转场建议等]
 ```
 
 ---
 
-## 完整示例
+## 完整示例（暖心毛毡风）
 
-### Scene 1: 开场 - 别花冤枉钱
+### Scene 1: 开场引入
 
-**分镜文案（中文）:**
-都2026年了，求求你们别再花几千块去报AI速成班了
+**分镜文案（中文）：**
+说到改名，1月27日
 
-**视觉描述（中文）:**
-俯视桌面场景，钞票长出翅膀飞向"AI速成班"招牌，钱包逐渐瘪掉。无角色，用物品动态表达"浪费金钱"的概念。
-
-**Veo3 Prompt:**
+**Veo3 Prompt (英文):**
 ```
-Stop-motion claymation animation, needle felting style with wool texture and visible fibers, top-down bird's eye view, on a warm wooden desk with cozy ambient lighting, multiple felted banknotes with tiny embroidered wings begin fluttering and taking flight one by one, they fly in a swirling pattern toward a small felt sign displaying "AI Speed Course ¥3999", a cute round felted wallet in the center of frame gradually deflates like a sad balloon as each note escapes, the wallet's button eyes droop downward in dismay, the last banknote pauses dramatically before joining the others, soft particles trail behind each flying note, static camera with very slow push in during climax, warm golden lighting with gentle shadows, whimsical yet cautionary mood
+Stop-motion claymation animation, needle felting style with wool texture and visible fibers, on a warm beige wool felt desk with soft cozy lighting, a cute anthropomorphic orange felted fox character with detailed appearance: round orange face with black button eyes and tiny white whisker dots, wearing a yellow felted beret hat with a small pom-pom on top, dressed in a teal blue cozy sweater with white buttons, orange felted hands with tiny claws, sitting cross-legged in front of a miniature computer, the fox turns its head slowly to look directly at the camera with curious expression, a small felted calendar appears in upper right corner showing text "Jan 27", warm golden hour sunlight streaming from upper left creating soft shadows, cozy craft room background with blurred elements, medium shot with static camera, focus on fox's face, hard cut transition
 ```
 
-**备注:**
-转场建议：溶解到下一场景
+### Scene 2: Anthropic 的要求
+
+**分镜文案（中文）：**
+Anthropic 说"Clawd"太像，要求改名
+
+**Veo3 Prompt (英文):**
+```
+Stop-motion claymation animation, needle felting style with wool texture, the same cute orange felted fox sitting at the warm desk looking upward with surprised expression: round eyes widened, mouth slightly open in surprise, wearing the same yellow beret and teal blue sweater, a large blue felted hand reaches slowly from above with visible fiber texture, the hand points with a felted finger at a name card on the desk displaying text "Clawd" in bold felted letters, soft dramatic warm lighting from above creating gentle shadows, handcrafted felt dolls aesthetic, medium shot with slow camera pushing forward to focus on fox's surprised face, dissolve transition
+```
 
 ---
 
-### Scene 2: 揭示 - 免费渠道
+## 提示词生成指南
 
-**分镜文案（中文）:**
-今天我把官方下场喂饭学AI的免费渠道扒出来
+### Veo3 提示词完整结构
 
-**视觉描述（中文）:**
-宝箱打开，金光涌出，带有各大平台Logo的卡片漂浮升起。可选角色（狐狸的手）从画面边缘伸入打开宝箱。
-
-**Veo3 Prompt:**
 ```
-Stop-motion claymation animation, needle felting style with fuzzy texture, medium shot from frontal low angle looking up at treasure, in a cozy dimly lit room, an ornate felted treasure chest with golden trim sits on a wooden pedestal, small felted orange fox paws reach in from the bottom of frame and slowly lift the heavy lid, as the lid opens golden light bursts outward illuminating the scene dramatically, multiple glowing cards rise and float upward from within the chest, each card displays recognizable logos - OpenAI green, Google colors, Microsoft blue - the cards orbit gently in the golden light beam, magical sparkle particles fill the air, camera holds steady then slowly pushes toward the glowing treasure, lighting transitions from dim mysterious to bright magical golden glow, sense of wonder and discovery
+[风格关键词],
+[场景环境 + 背景元素],
+[角色形象: 从头到脚详细描述],
+[核心动作: 起始→中间变化→结束状态，详细动作描述],
+[镜头类型 + 运动方式 + 焦点],
+[转场方式]
 ```
 
-**备注:**
-转场建议：硬切到下一场景
+**角色形象详细描述要求**（从头到脚）：
+- **头部**: 脸型、五官、表情、发型/发饰、帽子/头饰
+- **上身**: 上衣类型、颜色、图案、装饰品（项链/胸针等）
+- **下身**: 裤子/裙子类型、颜色、长度、腰带
+- **鞋子**: 鞋子类型、颜色
+- **手持物品**: 手里拿的东西（如果有）
+- **动物特色**: 耳朵/尾巴/触角等（如果是动物角色）
+
+**动态描述要求**：
+- 细化每个动作步骤，不只说"做某事"
+- 描述具体的手部/身体动作
+- 描述表情变化
+- 描述物体状态变化
+
+### 镜头运动词汇
+
+| 类型 | 英文描述 |
+|------|---------|
+| 固定 | static camera |
+| 推近 | slow camera push forward / camera pushes in |
+| 拉远 | camera pulls back / slow pull back |
+| 平移 | camera pans left/right |
+| 跟随 | camera follows [subject] |
+| 上移 | camera moves upward |
+| 下移 | camera moves downward |
+| 摇摆 | camera swings left and right |
+
+### 转场方式词汇
+
+| 类型 | 英文描述 |
+|------|---------|
+| 硬切 | hard cut / cut to |
+| 溶解 | dissolve / fade to |
+| 模糊过渡 | blur transition |
+| 匹配剪辑 | match cut |
 
 ---
 
-### Scene 3: 介绍 - OpenAI Academy
-
-**分镜文案（中文）:**
-NO.1 OpenAI Academy，这是ChatGPT的亲妈
-
-**视觉描述（中文）:**
-特写展示 OpenAI Logo 卡片，卡片发光旋转展示，背景出现 ChatGPT 气泡图标表示"亲妈"关系。
-
-**Veo3 Prompt:**
-```
-Stop-motion claymation animation, smooth polymer clay style with slight glossy sheen, close-up shot with shallow depth of field, a beautifully crafted felted card featuring the OpenAI logo in signature green slowly rotates to face camera, the card has embossed text "Academy" below the logo, behind the card a larger translucent ChatGPT speech bubble icon fades into view creating a visual parent-child connection, a thin glowing line connects the card to the bubble icon, the card completes one gentle rotation while hovering, number "1" in gold appears briefly in corner with sparkle, soft gradient background shifting from deep green to light, orbiting camera movement around the card, clean professional lighting with green accent glow, prestigious and authoritative mood
-```
-
-**备注:**
-转场建议：硬切
-
----
-
-### Scene 4: 功能 - 提示词库
-
-**分镜文案（中文）:**
-官方怕你不会用，直接把压箱底的提示词库都公开了
-
-**视觉描述（中文）:**
-俯视桌面，一个保险箱打开，大量提示词卡片飞出散布满桌面。表达"压箱底宝贝公开"的概念。
-
-**Veo3 Prompt:**
-```
-Stop-motion claymation animation, needle felting style with visible wool fibers, top-down overhead shot, on a warm felt desk surface, a small but heavy-looking felted safe with official OpenAI badge sits closed, the safe door slowly swings open with dramatic weight, immediately dozens of colorful prompt cards explode outward in all directions like confetti, each card has different colored borders and tiny text representing various prompt categories, cards scatter and land across the entire desk surface creating a beautiful spread, some cards spin and flutter as they land, the safe remains open and empty with a satisfied glow inside, static camera capturing the full explosion and settling, bright cheerful lighting with cards casting soft shadows, generous abundant mood
-```
-
-**备注:**
-转场建议：溶解
-
----
-
-### Scene 5: 应用 - 各行各业
-
-**分镜文案（中文）:**
-各行各业的高质量提示词都能免费获取：市场调研、营销文案、数据分析、品牌叙事
-
-**视觉描述（中文）:**
-四个职业/领域图标依次亮起，形成环绕排列。可以有角色在中间旋转指向，也可以纯图标动画。
-
-**Veo3 Prompt:**
-```
-Stop-motion claymation animation, needle felting style with soft fuzzy texture, medium shot with centered composition, four beautifully crafted felted icons arranged in a circle on a rotating platform: a magnifying glass with chart for Market Research, a pencil with paper for Copywriting, a bar graph with arrow for Data Analysis, a megaphone with heart for Brand Storytelling, each icon lights up sequentially with a soft glow and gentle bounce animation, as each lights up a small label appears below it, the platform slowly rotates to showcase each icon, all four icons pulse together at the end in unified glow, warm ambient lighting with each icon having its own accent color, camera holds centered with subtle breathing movement, professional yet approachable educational mood
-```
-
-**备注:**
-转场建议：硬切
-
----
-
-### Scene 6: 行动 - 复制粘贴
-
-**分镜文案（中文）:**
-全是现成的，复制粘贴就行
-
-**视觉描述（中文）:**
-特写手指点击复制按钮，卡片自动复制并飞入文件夹。表达"简单高效"的概念。
-
-**Veo3 Prompt:**
-```
-Stop-motion claymation animation, smooth polymer clay style with satisfying tactile quality, extreme close-up shot, a cute felted finger with tiny fingernail detail reaches toward a glowing blue "Copy" button, the finger presses down with satisfying depression animation, instantly a prompt card duplicates itself with a smooth split animation, the copy glows briefly then gracefully arcs through the air, it lands perfectly into an open folder icon with a soft satisfying thud, a small checkmark appears on the folder, the whole action feels effortless and magical, shallow depth of field with soft bokeh, camera follows the card's arc movement, crisp blue accent lighting on interactive elements, efficient and satisfying mood
-```
-
-**备注:**
-转场建议：淡出
-
----
-
-## 批量输出格式
-
-当需要快速复制所有提示词时，使用此格式：
+## 批量复制格式
 
 ```
-视频风格：[Style X: xxx风 - 风格描述]
+# Scene 1: [场景名称] | [分镜文案]
+[完整的 Veo3 提示词]
 
-=== SCENE 1: [标题] ===
-[文案]
----
-[Veo3 Prompt]
-
-=== SCENE 2: [标题] ===
-[文案]
----
-[Veo3 Prompt]
+# Scene 2: [场景名称] | [分镜文案]
+[完整的 Veo3 提示词]
 
 ...
 ```
 
 ---
 
+## 角色形象详细描述模板
+
+### 人物角色（从头到脚）
+
+```
+[cute anthropomorphic animal/human character] with detailed appearance:
+- Head & Face: [脸型 + 五官 + 表情状态]
+- Hair & Accessories: [发型/发色 + 帽子/头饰 + 眼镜/装饰]
+- Upper Body: [上衣类型 + 颜色 + 图案 + 扣子/拉链 + 装饰品（项链/胸针等）]
+- Lower Body: [裤子/裙子类型 + 颜色 + 长度 + 腰带/口袋]
+- Shoes: [鞋子类型 + 颜色 + 款式]
+- Held Items: [手里拿的东西，如果有]
+- Expression: [当前表情状态]
+- Pose: [身体姿态/姿势]
+```
+
+### 动物角色（从头到脚）
+
+```
+[cute felted animal character] with detailed appearance:
+- Head: [动物类型 + 毛绒质感 + 脸型 + 眼睛颜色 + 表情]
+- Ears: [耳朵形状 + 位置 + 可动性]
+- Body: [身体形状 + 颜色 + 质感 + 大小]
+- Limbs: [手臂/腿形状 + 关节可动性 + 爪子/爪子]
+- Tail: [尾巴形状 + 长度 + 摆动方式]
+- Clothing: [穿着类型 + 颜色 + 配件]
+- Accessories: [项圈/领结/背包等装饰]
+- Held Items: [手持物品]
+- Expression: [表情]
+- Pose: [姿态]
+```
+
+---
+
+## 动态描述详细模板
+
+```
+[核心动作: 起始→中间变化→结束状态，详细动作描述]
+
+起始状态:
+- [身体姿态描述]
+- [面部表情]
+- [物品位置]
+
+中间变化:
+- [具体手部动作: 手指如何移动、抓取、释放]
+- [身体动作: 转头、弯腰、跳跃、摇摆等]
+- [表情变化: 从XX表情变为XX表情]
+- [物品状态变化: 移动、变形、出现、消失等]
+
+结束状态:
+- [最终定格画面]
+- [最终表情]
+- [物品最终状态]
+```
+
+---
+
 ## 质量检查清单
 
-### 提示词检查
-- [ ] 开头声明了风格（stop-motion claymation + 材质）
-- [ ] 包含明确的镜头角度
-- [ ] 包含景别描述（close-up/medium/wide）
-- [ ] 描述了主体的详细外观
-- [ ] 包含完整的动态过程（起始→变化→结束）
-- [ ] 指定了镜头运动
-- [ ] 包含光影和氛围描述
-- [ ] 提示词长度 > 200 字符
+### Veo3 提示词检查
+- [ ] 包含完整风格关键词（Style A/B）
+- [ ] 场景描述清晰（环境/角色/动作/表情）
+- [ ] 光影风格与选定风格一致
+- [ ] 包含定格动画相关关键词
+- [ ] 镜头运动方式明确
+- [ ] 转场方式清晰
+- [ ] 涉及文字的部分已标注英文显示
+- [ ] 提示词长度 > 300 字符（确保足够详细）
 
-### 内容检查
-- [ ] 视觉隐喻与文案含义匹配
-- [ ] 有角色的场景描述了角色外观和动作
-- [ ] 无角色的场景用物品/场景动态表达
-- [ ] 镜头选择服务于内容表达
-- [ ] 整体风格一致
+### 一致性检查
+- [ ] 同一角色描述一致
+- [ ] 场景环境有延续性
+- [ ] 风格不混用
+
+---
+
+## 使用建议
+
+1. **直接复制使用**: Veo3 提示词已包含所有必要信息，可直接用于视频生成
+2. **先生成 Midjourney 参考图**（可选）: 如果需要确定角色造型，先用简化版提示词生成参考图
+3. **批量生成**: 使用批量复制包一次性生成所有场景
 
 ---
 
 **完成本阶段后，用户获得：**
-- ✅ 每个分镜的中文文案（用于配音/字幕）
-- ✅ 每个分镜的视觉描述（理解画面内容）
-- ✅ 完整的 Veo3 英文提示词（包含镜头角度、景别、运动等，可直接复制使用）
-- ✅ 转场建议（可选备注）
+- ✅ 每个分镜的文案（≤30字）
+- ✅ 完整的英文 Veo3 提示词（可直接使用）
+- ✅ 所有信息融入提示词，无需额外中文指导
+- ✅ 涉及文字的部分使用英文显示
