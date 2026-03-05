@@ -59,6 +59,7 @@ For more information, check out:
 | skill-share                          | 创建并分享技能 / Slack 团队协作                   |
 | slack-gif-creator                    | 创建 Slack GIF / 制作动画表情                     |
 | social-post-writer                   | 写社交媒体帖子 / 发朋友圈 / 写推文                |
+| superpowers                          | 软件开发工作流 / TDD / 代码审查 / Git Worktrees   |
 | tailored-resume-generator            | 定制简历 / 针对职位优化简历                       |
 | theme-factory                        | 应用主题 / 美化幻灯片 / 文档样式                  |
 | thought-mining (思维挖掘助手)        | 我想写篇文章 / 整理我的想法                       |
@@ -712,6 +713,37 @@ React 视频生成
 
 ---
 
+#### [superpowers](./superpowers) （软件开发工作流）
+
+**描述**: 完整的软件开发工作流，基于可组合的"技能"系统，让你的 AI 编程代理拥有真正的超能力。
+
+**来源**: [https://github.com/obra/superpowers](https://github.com/obra/superpowers)
+
+**核心工作流**:
+1. **brainstorming** - 在编写代码前激活，通过对话细化需求，探索替代方案
+2. **using-git-worktrees** - 设计批准后创建隔离工作空间，运行项目设置
+3. **writing-plans** - 将工作分解为小任务（2-5分钟），包含精确路径和验证步骤
+4. **subagent-driven-development** - 派遣子代理处理每个任务，两阶段审查（规范合规性 + 代码质量）
+5. **test-driven-development** - 强制 RED-GREEN-REFACTOR：先写失败测试，再写最少代码
+6. **requesting-code-review** - 按计划审查，按严重程度报告问题
+7. **finishing-a-development-branch** - 验证测试，提供合并/PR/保留/丢弃选项
+
+**包含技能**:
+- **测试**: test-driven-development
+- **调试**: systematic-debugging, verification-before-completion
+- **协作**: brainstorming, writing-plans, executing-plans, dispatching-parallel-agents, requesting-code-review, receiving-code-review, using-git-worktrees, finishing-a-development-branch, subagent-driven-development
+- **元技能**: writing-skills, using-superpowers
+
+**触发方式**:
+```
+帮助我规划这个功能
+让我们调试这个问题
+软件开发的完整工作流
+使用 superpowers
+```
+
+---
+
 #### [slack-gif-creator](./slack-gif-creator)
 
 **描述**: 为 Slack 创建优化动画 GIF 的知识和工具集。提供约束、验证工具和动画概念。
@@ -1036,14 +1068,14 @@ YouTube 下载器 / B站下载
 
 | 类别           | 数量                        |
 | -------------- | --------------------------- |
-| 英文技能       | 46                          |
+| 英文技能       | 47                          |
 | 中文技能       | 8                           |
 | 无 SKILL.md    | 2 (pm-practice, 剪口播/)    |
-| **总计** | **56**                |
+| **总计** | **57**                |
 
 ---
 
-*最后更新: 2026-02-26*
+*最后更新: 2026-03-02*
 
 ---
 
